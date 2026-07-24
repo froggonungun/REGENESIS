@@ -24,7 +24,7 @@ import java.util.Random;
 
 public class PlayerEventHandler {
     public static final ResourceLocation LIMBO = ResourceLocation.fromNamespaceAndPath(RegenesisMod.MODID, "limbo");
-    public static final int LIMBO_TIME = 500;
+    public static final int LIMBO_TIME = 2400;
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
