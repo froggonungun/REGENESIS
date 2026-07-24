@@ -13,17 +13,20 @@ import static ru.jgers.regenesis.RegenesisMod.NETWORK;
 
 public class SyncPacket {
     private final int year;
+    private final int tick;
 
-    public SyncPacket(int year) {
+    public SyncPacket(int year, int tick) {
         this.year = year;
+        this.tick = tick;
     }
 
     public static void encode(SyncPacket packet, FriendlyByteBuf buf) {
         buf.writeInt(packet.year);
+        buf.writeInt(packet.tick);
     }
 
     public static SyncPacket decode(FriendlyByteBuf buf) {
-        return new SyncPacket(buf.readInt());
+        return new SyncPacket(buf.readInt(), buf.readInt());
     }
 
     public static void handle(SyncPacket packet, Supplier<NetworkEvent.Context> ctx) {
@@ -32,6 +35,7 @@ public class SyncPacket {
             if (player != null) {
                 player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
                     data.setYearCount(packet.year);
+                    data.setTickCount(packet.tick);
                 });
             }
         });
@@ -41,7 +45,7 @@ public class SyncPacket {
     public static void sync(Player player) {
         if (!player.level().isClientSide) {
             player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
-                NETWORK.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SyncPacket(data.getYearCount()));
+                NETWORK.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SyncPacket(data.getYearCount(), data.getTickCount()));
             });
         }
     }

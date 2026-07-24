@@ -3,7 +3,6 @@ package ru.jgers.regenesis.event;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -25,32 +24,27 @@ import java.util.Random;
 
 public class PlayerEventHandler {
     public static final ResourceLocation LIMBO = ResourceLocation.fromNamespaceAndPath(RegenesisMod.MODID, "limbo");
-    private static final String LIMBO_TICKS = "limbo_ticks";
-    public static final String LIMBO_SHOW_TITLE = "limbo_show_title";
-    private static final int LIMBO_TIME = 2400;
+    public static final int LIMBO_TIME = 500;
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
-        CompoundTag persistentData = player.getPersistentData();
 
-        if (event.type != TickEvent.Type.PLAYER) return;
+        if (event.type != TickEvent.Type.PLAYER || player.level().isClientSide()) return;
 
-        if (player.level().dimension().location().equals(LIMBO)) {
-            int ticks = persistentData.contains(LIMBO_TICKS) ? persistentData.getInt(LIMBO_TICKS) : 0;
-            ticks++;
-            persistentData.putInt(LIMBO_TICKS, ticks);
-
-            if (ticks >= LIMBO_TIME - 250) {
-                persistentData.putBoolean(LIMBO_SHOW_TITLE, true);
-                if (ticks >= LIMBO_TIME) {
-                    if (!player.level().isClientSide() && player.getServer() != null) {
-                        respawnPlayer(player);
+        player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
+            if (player.level().dimension().location().equals(LIMBO) || data.getTickCount() >= LIMBO_TIME) {
+                data.incrementTickCount();
+                SyncPacket.sync(player);
+                if (data.getTickCount() >= LIMBO_TIME) {
+                    respawnPlayer(player);
+                    if (data.getTickCount() >= LIMBO_TIME + 200) {
+                        data.setTickCount(0);
+                        SyncPacket.sync(player);
                     }
-                    persistentData.putBoolean(LIMBO_SHOW_TITLE, false);
                 }
             }
-        }
+        });
     }
 
     @SubscribeEvent
@@ -112,11 +106,14 @@ public class PlayerEventHandler {
 
         Random random = new Random();
 
+        level.setBlock(pos.above(1), Blocks.AIR.defaultBlockState(), 0);
+
         level.setBlock(pos.below(), Blocks.AIR.defaultBlockState(), 11);
         placeDirt(pos.below(), level);
 
         level.setBlock(pos.below(2), Blocks.AIR.defaultBlockState(), 11);
         placeDirt(pos.below(2), level);
+        level.getLightEngine().checkBlock(pos.below(2));
 
         level.setBlock(pos.below(3), Blocks.DIRT.defaultBlockState(), 11);
 

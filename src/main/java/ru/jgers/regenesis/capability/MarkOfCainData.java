@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class MarkOfCainData implements IMarkOfCainData {
     private int yearCount = 0;
+    private int tickCount = 0;
 
     @Override
     public int getYearCount() {
@@ -19,5 +20,20 @@ public class MarkOfCainData implements IMarkOfCainData {
     public void incrementYearCount() {
         Random random = new Random();
         this.yearCount = this.yearCount + random.nextInt(2, 15);
+    }
+
+    @Override
+    public int getTickCount() {
+        return this.tickCount;
+    }
+
+    @Override
+    public void setTickCount(int tickCount) {
+        this.tickCount = tickCount;
+    }
+
+    @Override
+    public void incrementTickCount() {
+        this.tickCount++;
     }
 }

@@ -12,8 +12,9 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import ru.jgers.regenesis.RegenesisMod;
-import ru.jgers.regenesis.capability.MarkOfCainCapabilities;;
-import ru.jgers.regenesis.event.PlayerEventHandler;
+import ru.jgers.regenesis.capability.MarkOfCainCapabilities;
+
+import static ru.jgers.regenesis.event.PlayerEventHandler.LIMBO_TIME;
 
 @Mod.EventBusSubscriber(modid = RegenesisMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TitleRenderHandler {
@@ -26,7 +27,7 @@ public class TitleRenderHandler {
         if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type() || player == null) return;
 
         player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
-            if (!player.getPersistentData().getBoolean(PlayerEventHandler.LIMBO_SHOW_TITLE)) return;
+            if (data.getTickCount() <= LIMBO_TIME) return;
 
             GuiGraphics graphics = event.getGuiGraphics();
             Font font = mc.font;

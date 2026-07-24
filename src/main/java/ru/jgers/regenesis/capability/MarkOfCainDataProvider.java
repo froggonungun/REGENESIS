@@ -31,11 +31,13 @@ public class MarkOfCainDataProvider implements ICapabilitySerializable<CompoundT
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("year", data.getYearCount());
+        tag.putInt("tick", data.getTickCount());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
         data.setYearCount(nbt.getInt("year"));
+        data.setTickCount(nbt.getInt("tick"));
     }
 }
