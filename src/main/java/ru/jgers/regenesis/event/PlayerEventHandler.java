@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ru.jgers.regenesis.RegenesisMod;
 import ru.jgers.regenesis.capability.MarkOfCainCapabilities;
 import ru.jgers.regenesis.network.SyncPacket;
 
@@ -23,7 +24,7 @@ import java.util.Random;
 
 
 public class PlayerEventHandler {
-    public static final ResourceLocation LIMBO = ResourceLocation.fromNamespaceAndPath("markofcain", "limbo");
+    public static final ResourceLocation LIMBO = ResourceLocation.fromNamespaceAndPath(RegenesisMod.MODID, "limbo");
     private static final String LIMBO_TICKS = "limbo_ticks";
     public static final String LIMBO_SHOW_TITLE = "limbo_show_title";
     private static final int LIMBO_TIME = 2400;
