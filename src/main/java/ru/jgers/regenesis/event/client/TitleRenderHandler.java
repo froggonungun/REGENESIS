@@ -55,9 +55,9 @@ public class TitleRenderHandler {
             scale = 2;
 
             poseStack.pushPose();
-            poseStack.translate(x - font.width(Component.translatable("markofcain.limbo.title")) * scale / 2, y - 2 * font.lineHeight * scale, 0);
+            poseStack.translate(x - font.width(Component.translatable("regenesis.limbo.title")) * scale / 2, y - 2 * font.lineHeight * scale, 0);
             poseStack.scale(scale, scale, 1);
-            graphics.drawString(font, Component.translatable("markofcain.limbo.title"), 0, 0, 0xFFFFFF, true);
+            graphics.drawString(font, Component.translatable("regenesis.limbo.title"), 0, 0, 0xFFFFFF, true);
 
             poseStack.popPose();
 
