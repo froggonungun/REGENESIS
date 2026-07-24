@@ -1,0 +1,36 @@
+{
+  "type": "regenesis:limbo_type",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "regenesis:limbo",
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "biomes": [
+        {
+          "biome": "regenesis:plains_limbo",
+          "parameters": {
+            "temperature": 0.5,
+            "humidity": 0.5,
+            "continentalness": 0.0,
+            "erosion": 0.0,
+            "depth": 0.0,
+            "weirdness": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "regenesis:desert_limbo",
+          "parameters": {
+            "temperature": 1.0,
+            "humidity": -0.5,
+            "continentalness": 0.0,
+            "erosion": 0.0,
+            "depth": 0.0,
+            "weirdness": 0.0,
+            "offset": 0.0
+          }
+        }
+        ]
+    }
+  }
+}
