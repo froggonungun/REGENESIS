@@ -50,13 +50,14 @@ public class PlayerEventHandler {
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         Player player = event.getEntity();
-        BlockPos spawnPos = player.level().getSharedSpawnPos();
         ServerLevel limbo = player.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, PlayerEventHandler.LIMBO));
 
-        if (limbo == null) return;
+        if (limbo == null || player.getLastDeathLocation().isEmpty()) return;
+
+        BlockPos pos = player.getLastDeathLocation().get().pos();
 
         if (!player.level().isClientSide()) {
-            player.teleportTo(limbo, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(),
+            player.teleportTo(limbo, pos.getX(), pos.getY(), pos.getZ(),
                     EnumSet.noneOf(RelativeMovement.class), player.getYRot(), player.getXRot());
 
             player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
