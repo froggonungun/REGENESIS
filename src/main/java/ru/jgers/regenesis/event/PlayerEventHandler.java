@@ -11,6 +11,7 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,7 +26,7 @@ import java.util.Random;
 
 public class PlayerEventHandler {
     public static final ResourceLocation LIMBO = ResourceLocation.fromNamespaceAndPath(RegenesisMod.MODID, "limbo");
-    public static final int LIMBO_TIME = 2400;
+    public static final int LIMBO_TIME = 500;
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -42,10 +43,17 @@ public class PlayerEventHandler {
                 }
             }
 
+            if (player.level().dimension().equals(Level.OVERWORLD) && data.getTickCount() >= LIMBO_TIME) {
+                data.incrementTickCount();
+                SyncPacket.sync(player);
+            }
+
             if (data.getTickCount() >= LIMBO_TIME + 200) {
                 data.setTickCount(0);
                 SyncPacket.sync(player);
             }
+
+            RegenesisMod.LOGGER.info(String.valueOf(data.getTickCount()));
         });
     }
 
