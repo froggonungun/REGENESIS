@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "regenesis:sign3",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 14,
+    "separation": 10,
+    "salt": 1245378478
+  }
+}

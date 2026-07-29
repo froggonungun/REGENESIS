@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.Nullable;
 import ru.jgers.regenesis.RegenesisMod;
 import ru.jgers.regenesis.capability.MarkOfCainCapabilities;
 import ru.jgers.regenesis.network.SyncPacket;
@@ -33,16 +34,17 @@ public class PlayerEventHandler {
         if (event.type != TickEvent.Type.PLAYER || player.level().isClientSide()) return;
 
         player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
-            if (player.level().dimension().location().equals(LIMBO) || data.getTickCount() >= LIMBO_TIME) {
+            if (player.level().dimension().location().equals(LIMBO)) {
                 data.incrementTickCount();
                 SyncPacket.sync(player);
                 if (data.getTickCount() >= LIMBO_TIME) {
                     respawnPlayer(player);
-                    if (data.getTickCount() >= LIMBO_TIME + 200) {
-                        data.setTickCount(0);
-                        SyncPacket.sync(player);
-                    }
                 }
+            }
+
+            if (data.getTickCount() >= LIMBO_TIME + 200) {
+                data.setTickCount(0);
+                SyncPacket.sync(player);
             }
         });
     }
@@ -50,20 +52,8 @@ public class PlayerEventHandler {
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         Player player = event.getEntity();
-        ServerLevel limbo = player.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, PlayerEventHandler.LIMBO));
-
-        if (limbo == null || player.getLastDeathLocation().isEmpty()) return;
-
-        BlockPos pos = player.getLastDeathLocation().get().pos();
-
         if (!player.level().isClientSide()) {
-            player.teleportTo(limbo, pos.getX(), pos.getY(), pos.getZ(),
-                    EnumSet.noneOf(RelativeMovement.class), player.getYRot(), player.getXRot());
-
-            player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
-                data.incrementYearCount();
-                SyncPacket.sync(player);
-            });
+            teleportToLimbo(player);
         }
     }
 
@@ -136,5 +126,47 @@ public class PlayerEventHandler {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             level.setBlock(pos.relative(direction), Blocks.DIRT.defaultBlockState(), 11);
         }
+    }
+
+    /**
+     * Teleport player into regenesis:limbo dimension on last death pos, if last death pos is unsafe
+     * teleport to world spawn
+     **/
+
+    public static void teleportToLimbo(Player player) {
+        ServerLevel limbo = player.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, PlayerEventHandler.LIMBO));
+
+        if (limbo == null || player.getLastDeathLocation().isEmpty()) return;
+
+        BlockPos pos = getSafePos(limbo, player.getLastDeathLocation().get().pos(), player);
+
+        if (pos == null) {
+            pos = player.level().getSharedSpawnPos();
+        }
+
+        player.teleportTo(limbo, pos.getX(), pos.getY(), pos.getZ(),
+                EnumSet.noneOf(RelativeMovement.class), player.getYRot(), player.getXRot());
+
+        player.getCapability(MarkOfCainCapabilities.CAPABILITY).ifPresent(data -> {
+            data.incrementYearCount();
+            SyncPacket.sync(player);
+        });
+    }
+
+    /**
+     * Return safe pos for player teleport. If there's no safe pos return null
+    **/
+
+    @Nullable
+    public static BlockPos getSafePos(ServerLevel level, BlockPos pos, Player player) {
+        for (int i = 0; i <= 259; i++) {
+            BlockPos safePos = pos.atY(60 + i);
+            if (level.getBlockState(safePos).is(Blocks.AIR) &&
+                    level.getBlockState(safePos.above(1)).is(Blocks.AIR) &&
+                    level.loadedAndEntityCanStandOn(safePos.below(1), player)) {
+                return safePos;
+            }
+        }
+        return null;
     }
 }

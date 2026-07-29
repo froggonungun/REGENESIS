@@ -1,0 +1,15 @@
+{
+  "name": "regenesis:sign3",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "processors": "minecraft:empty",
+        "location": "regenesis:sign3"
+      },
+      "weight": 2
+    }
+  ]
+}

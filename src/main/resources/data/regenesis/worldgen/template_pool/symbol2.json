@@ -1,0 +1,15 @@
+{
+  "name": "regenesis:symbol2",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "processors": "minecraft:empty",
+        "location": "regenesis:symbol2"
+      },
+      "weight": 2
+    }
+  ]
+}
